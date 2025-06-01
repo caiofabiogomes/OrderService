@@ -1,5 +1,6 @@
 ﻿using OrderService.Domain.Entities;
 using OrderService.Domain.Enums;
+using OrderService.Domain.Exceptions;
 using OrderService.Domain.ValueObjects;
 
 namespace OrderService.Tests.Domain.Entites
@@ -59,7 +60,9 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CanMarkAsAcceptedFromPending()
         {
-            var order = new Order();
+            var orderTotalAmount = new OrderTotalAmount(100);
+
+            var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
 
             order.MarkAsAccepted();
 
@@ -69,7 +72,9 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CanMarkAsRejectedFromPending()
         {
-            var order = new Order();
+            var orderTotalAmount = new OrderTotalAmount(100);
+
+            var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
 
             order.MarkAsRejected();
 
@@ -79,24 +84,32 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CantMarkAsCompletedFromPending()
         {
-            var order = new Order();
+            var orderTotalAmount = new OrderTotalAmount(100);
 
-            Assert.Throws<InvalidOperationException>(() => order.MarkAsCompleted());
+            var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
+
+            Assert.Throws<DomainException>(() => order.MarkAsCompleted());
         }
 
         [Fact]
         public void Order_CantMarkAsCancelledWithoutJustification()
         {
-            var order = new Order();
+            var orderTotalAmount = new OrderTotalAmount(100);
 
-            Assert.Throws<ArgumentException>(() => order.MarkAsCancelled(null));
-            Assert.Throws<ArgumentException>(() => order.MarkAsCancelled(""));
+            var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
+            order.MarkAsAccepted();
+
+            Assert.Throws<DomainException>(() => order.MarkAsCancelled(null));
+            Assert.Throws<DomainException>(() => order.MarkAsCancelled(""));
         }
 
         [Fact]
         public void Order_CanMarkAsCancelledWithJustificationFromPending()
         {
-            var order = new Order();
+            var orderTotalAmount = new OrderTotalAmount(100);
+
+            var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
+            order.MarkAsAccepted();
 
             order.MarkAsCancelled("Valid reason");
 
@@ -106,15 +119,19 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CantMarkAsProcessingFromPending()
         {
-            var order = new Order();
+            var orderTotalAmount = new OrderTotalAmount(100);
 
-            Assert.Throws<InvalidOperationException>(() => order.MarkAsProcessing());
+            var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
+
+            Assert.Throws<DomainException>(() => order.MarkAsProcessing());
         }
 
         [Fact]
         public void Order_CanMarkAsProcessingFromAccepted()
         {
-            var order = new Order();
+            var orderTotalAmount = new OrderTotalAmount(100);
+
+            var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             order.MarkAsAccepted();
 
             order.MarkAsProcessing();
@@ -125,16 +142,20 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CantMarkAsCompletedFromAccepted()
         {
-            var order = new Order();
+            var orderTotalAmount = new OrderTotalAmount(100);
+
+            var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             order.MarkAsAccepted();
 
-            Assert.Throws<InvalidOperationException>(() => order.MarkAsCompleted());
+            Assert.Throws<DomainException>(() => order.MarkAsCompleted());
         }
 
         [Fact]
         public void Order_CanMarkAsCompletedFromProcessing()
         {
-            var order = new Order();
+            var orderTotalAmount = new OrderTotalAmount(100);
+
+            var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             order.MarkAsAccepted();
             order.MarkAsProcessing();
 
@@ -146,25 +167,31 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CantChangeStatusAfterRejected()
         {
-            var order = new Order();
+            var orderTotalAmount = new OrderTotalAmount(100);
+
+            var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             order.MarkAsRejected();
 
-            Assert.Throws<InvalidOperationException>(() => order.MarkAsAccepted());
-            Assert.Throws<InvalidOperationException>(() => order.MarkAsProcessing());
-            Assert.Throws<InvalidOperationException>(() => order.MarkAsCompleted());
-            Assert.Throws<InvalidOperationException>(() => order.MarkAsCancelled("Trying to cancel rejected"));
+            Assert.Throws<DomainException>(() => order.MarkAsAccepted());
+            Assert.Throws<DomainException>(() => order.MarkAsProcessing());
+            Assert.Throws<DomainException>(() => order.MarkAsCompleted());
+            Assert.Throws<DomainException>(() => order.MarkAsCancelled("Trying to cancel rejected"));
         }
 
         [Fact]
         public void Order_CantChangeStatusAfterCancelled()
         {
-            var order = new Order();
+            var orderTotalAmount = new OrderTotalAmount(100);
+
+            var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
+            order.MarkAsAccepted();
+
             order.MarkAsCancelled("Cancelling order");
 
-            Assert.Throws<InvalidOperationException>(() => order.MarkAsAccepted());
-            Assert.Throws<InvalidOperationException>(() => order.MarkAsProcessing());
-            Assert.Throws<InvalidOperationException>(() => order.MarkAsCompleted());
-            Assert.Throws<InvalidOperationException>(() => order.MarkAsRejected());
+            Assert.Throws<DomainException>(() => order.MarkAsAccepted());
+            Assert.Throws<DomainException>(() => order.MarkAsProcessing());
+            Assert.Throws<DomainException>(() => order.MarkAsCompleted());
+            Assert.Throws<DomainException>(() => order.MarkAsRejected());
         }
 
     }

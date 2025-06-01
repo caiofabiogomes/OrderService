@@ -1,4 +1,7 @@
 ﻿
+using OrderService.Domain.Enums;
+using OrderService.Domain.Exceptions;
+
 namespace OrderService.Tests.Domain.ValueObjects
 {
     public class OrderStatusTests
@@ -28,21 +31,38 @@ namespace OrderService.Tests.Domain.ValueObjects
         public void Order_CantTransitionFromPendingToCancelled()
         {
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
-            Assert.Throws<ArgumentException>(() => orderStatus.Cancelled("Cancel Order"));
+            
+            var exception = Assert.Throws<DomainException>(() => orderStatus.Cancelled("Cancel Order"));
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToCancel, OrderService.Domain.Enums.OrderStatus.Pending);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Fact]
         public void Order_CantTransitionFromPendingToProcessing()
         {
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
-            Assert.Throws<ArgumentException>(() => orderStatus.Processing());
+            
+            var exception =  Assert.Throws<DomainException>(() => orderStatus.Processing());
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToProcessing,
+                OrderService.Domain.Enums.OrderStatus.Pending);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Fact]
         public void Order_CantTransitionFromPendingToCompleted()
         {
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
-            Assert.Throws<ArgumentException>(() => orderStatus.Completed());
+            
+            var exception = Assert.Throws<DomainException>(() => orderStatus.Completed());
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToCompleted, 
+                OrderStatus.Pending);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         #endregion
@@ -54,7 +74,13 @@ namespace OrderService.Tests.Domain.ValueObjects
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
             var rejectedStatus = orderStatus.Rejected();
 
-            Assert.Throws<InvalidOperationException>(() => rejectedStatus.Accepted());
+            var exception = Assert.Throws<DomainException>(() => rejectedStatus.Accepted());
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToAccepted,
+                OrderStatus.Rejected);
+
+            Assert.Equal(expectedMessage, exception.Message);
+
         }
 
         [Fact]
@@ -63,7 +89,11 @@ namespace OrderService.Tests.Domain.ValueObjects
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
             var rejectedStatus = orderStatus.Rejected();
 
-            Assert.Throws<InvalidOperationException>(() => rejectedStatus.Cancelled("Cannot cancel a rejected order"));
+            var exception = Assert.Throws<DomainException>(() => rejectedStatus.Cancelled("Cannot cancel a rejected order"));
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToCancel, OrderStatus.Rejected);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Fact]
@@ -72,7 +102,12 @@ namespace OrderService.Tests.Domain.ValueObjects
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
             var rejectedStatus = orderStatus.Rejected();
 
-            Assert.Throws<InvalidOperationException>(() => rejectedStatus.Processing());
+            var exception = Assert.Throws<DomainException>(() => rejectedStatus.Processing());
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToProcessing, 
+                OrderStatus.Rejected);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Fact]
@@ -81,7 +116,12 @@ namespace OrderService.Tests.Domain.ValueObjects
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
             var rejectedStatus = orderStatus.Rejected();
 
-            Assert.Throws<InvalidOperationException>(() => rejectedStatus.Completed());
+            var exception = Assert.Throws<DomainException>(() => rejectedStatus.Completed());
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToCompleted,
+                OrderService.Domain.Enums.OrderStatus.Rejected);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         #endregion
@@ -115,7 +155,12 @@ namespace OrderService.Tests.Domain.ValueObjects
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
             var acceptedStatus = orderStatus.Accepted();
 
-            Assert.Throws<InvalidOperationException>(() => acceptedStatus.Completed());
+            var exception = Assert.Throws<DomainException>(() => acceptedStatus.Completed());
+
+            var expectedMessage = string.Format(DomainExceptionMessages.InvalidOrderStatusTransitionToCompleted, 
+                OrderService.Domain.Enums.OrderStatus.Accepted.ToString());
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Fact]
@@ -124,7 +169,12 @@ namespace OrderService.Tests.Domain.ValueObjects
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
             var acceptedStatus = orderStatus.Accepted();
 
-            Assert.Throws<InvalidOperationException>(() => acceptedStatus.Rejected());
+            var exception = Assert.Throws<DomainException>(() => acceptedStatus.Rejected());
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToRejected, 
+                OrderService.Domain.Enums.OrderStatus.Accepted);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         #endregion
@@ -134,36 +184,60 @@ namespace OrderService.Tests.Domain.ValueObjects
         public void Order_CantTransitionFromCancelledToAccepted()
         {
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
-            var cancelledStatus = orderStatus.Cancelled("Initial cancellation");
+            var acceptedStatus = orderStatus.Accepted();
+            var cancelledStatus = acceptedStatus.Cancelled("Initial cancellation");
 
-            Assert.Throws<InvalidOperationException>(() => cancelledStatus.Accepted());
+            var exception = Assert.Throws<DomainException>(() => cancelledStatus.Accepted());
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToAccepted,
+                OrderService.Domain.Enums.OrderStatus.Cancelled);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Fact]
         public void Order_CantTransitionFromCancelledToProcessing()
         {
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
-            var cancelledStatus = orderStatus.Cancelled("Initial cancellation");
+            var acceptedStatus = orderStatus.Accepted();
+            var cancelledStatus = acceptedStatus.Cancelled("Initial cancellation");
 
-            Assert.Throws<InvalidOperationException>(() => cancelledStatus.Processing());
+            var exception = Assert.Throws<DomainException>(() => cancelledStatus.Processing());
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToProcessing,
+                OrderService.Domain.Enums.OrderStatus.Cancelled);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Fact]
         public void Order_CantTransitionFromCancelledToCompleted()
         {
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
-            var cancelledStatus = orderStatus.Cancelled("Initial cancellation");
+            var acceptedStatus = orderStatus.Accepted();
+            var cancelledStatus = acceptedStatus.Cancelled("Initial cancellation");
 
-            Assert.Throws<InvalidOperationException>(() => cancelledStatus.Completed());
+            var exception  = Assert.Throws<DomainException>(() => cancelledStatus.Completed());
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToCompleted,
+                OrderService.Domain.Enums.OrderStatus.Cancelled);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Fact]
         public void Order_CantTransitionFromCancelledToRejected()
         {
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
-            var cancelledStatus = orderStatus.Cancelled("Initial cancellation");
+            var acceptedStatus = orderStatus.Accepted();
+            var cancelledStatus = acceptedStatus.Cancelled("Initial cancellation");
 
-            Assert.Throws<InvalidOperationException>(() => cancelledStatus.Rejected());
+            var exception = Assert.Throws<DomainException>(() => cancelledStatus.Rejected());
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToRejected,
+                OrderService.Domain.Enums.OrderStatus.Cancelled);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         #endregion
@@ -186,7 +260,12 @@ namespace OrderService.Tests.Domain.ValueObjects
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
             var processingStatus = orderStatus.Accepted().Processing();
 
-            Assert.Throws<InvalidOperationException>(() => processingStatus.Accepted());
+            var exception = Assert.Throws<DomainException>(() => processingStatus.Accepted());
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToAccepted,
+                OrderService.Domain.Enums.OrderStatus.Processing);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Fact]
@@ -195,7 +274,12 @@ namespace OrderService.Tests.Domain.ValueObjects
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
             var processingStatus = orderStatus.Accepted().Processing();
 
-            Assert.Throws<InvalidOperationException>(() => processingStatus.Cancelled("Cannot cancel from processing"));
+            var exception = Assert.Throws<DomainException>(() => processingStatus.Cancelled("Cannot cancel from processing"));
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToCancel,
+                OrderService.Domain.Enums.OrderStatus.Processing);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Fact]
@@ -204,7 +288,12 @@ namespace OrderService.Tests.Domain.ValueObjects
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
             var processingStatus = orderStatus.Accepted().Processing();
 
-            Assert.Throws<InvalidOperationException>(() => processingStatus.Rejected());
+            var exception = Assert.Throws<DomainException>(() => processingStatus.Rejected());
+
+            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToRejected,
+                OrderService.Domain.Enums.OrderStatus.Processing);
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         #endregion
@@ -216,11 +305,12 @@ namespace OrderService.Tests.Domain.ValueObjects
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
             var acceptedStatus = orderStatus.Accepted();
 
-            // Tenta cancelar sem justificativa (string vazia)
-            Assert.Throws<ArgumentException>(() => acceptedStatus.Cancelled(""));
+            var exception1 = Assert.Throws<DomainException>(() => acceptedStatus.Cancelled(""));
+            var exception2 = Assert.Throws<DomainException>(() => acceptedStatus.Cancelled(null));
 
-            // Tenta cancelar sem justificativa (null)
-            Assert.Throws<ArgumentException>(() => acceptedStatus.Cancelled(null));
+
+            Assert.Equal(DomainExceptionMessages.InvalidOrderStatusTransitionToCancelledWithoutJustification, exception1.Message);
+            Assert.Equal(DomainExceptionMessages.InvalidOrderStatusTransitionToCancelledWithoutJustification, exception2.Message);
         }
 
         [Fact]
@@ -235,5 +325,10 @@ namespace OrderService.Tests.Domain.ValueObjects
         }
 
         #endregion
+
+        private static string GetExpectedMessage(string message, OrderStatus status)
+        {
+            return string.Format(message, status);
+        }
     }
 }
