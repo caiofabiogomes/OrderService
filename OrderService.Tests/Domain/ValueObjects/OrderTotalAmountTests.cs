@@ -1,4 +1,5 @@
-﻿using OrderService.Domain.ValueObjects;
+﻿using OrderService.Domain.Exceptions;
+using OrderService.Domain.ValueObjects;
 
 namespace OrderService.Tests.Domain.ValueObjects
 {
@@ -7,9 +8,11 @@ namespace OrderService.Tests.Domain.ValueObjects
         [Fact]
         public void Order_ShouldNotAcceptedNegativeTotalAmount()
         {
-            var orderTotalAmount = new OrderTotalAmount(-100);
+            decimal invalidAmount = -100;
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => orderTotalAmount.Amount);
+            var exception = Assert.Throws<DomainException>(() => new OrderTotalAmount(invalidAmount));
+
+            Assert.Equal(DomainExceptionMessages.InvalidOrderTotalAmount, exception.Message);
         }
 
         [Fact]
@@ -24,9 +27,11 @@ namespace OrderService.Tests.Domain.ValueObjects
         [Fact]
         public void Order_ShouldNotAcceptedZeroTotalAmount()
         {
-            var orderTotalAmount = new OrderTotalAmount(0);
+            decimal invalidAmount = 0;
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => orderTotalAmount.Amount);
+            var exception = Assert.Throws<DomainException>(() => new OrderTotalAmount(invalidAmount));
+
+            Assert.Equal(DomainExceptionMessages.InvalidOrderTotalAmount, exception.Message);
         }
     }
 }
