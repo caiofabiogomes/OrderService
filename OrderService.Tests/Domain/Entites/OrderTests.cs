@@ -10,7 +10,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_ShouldHaveDefaultStatusPending_WhenCreated()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
             var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             
             var status = order.OrderStatus.Status;
@@ -22,7 +22,7 @@ namespace OrderService.Tests.Domain.Entites
         {
             var customerId = Guid.NewGuid();
             var mode = OrderMode.DriveThru;
-            var totalAmount = new OrderTotalAmount(100);
+            var totalAmount = new Price(100);
             var order = new Order(customerId, mode, totalAmount);
 
             Assert.Equal(customerId, order.CustomerId);
@@ -35,8 +35,8 @@ namespace OrderService.Tests.Domain.Entites
         public void Orders_WithSameCustomerId_ShouldHaveDifferentIds()
         {
             var customerId = Guid.NewGuid();
-            var orderTotalAmount1 = new OrderTotalAmount(100);
-            var orderTotalAmount2 = new OrderTotalAmount(200);
+            var orderTotalAmount1 = new Price(100);
+            var orderTotalAmount2 = new Price(200);
 
             var order1 = new Order(customerId, OrderMode.Counter, orderTotalAmount1);
             var order2 = new Order(customerId, OrderMode.DriveThru, orderTotalAmount2);
@@ -46,7 +46,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_ShouldHaveUniqueId_WhenCreated()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             var order1 = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             var order2 = new Order(Guid.NewGuid(), OrderMode.DriveThru, orderTotalAmount);
@@ -60,7 +60,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CanMarkAsAcceptedFromPending()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
 
@@ -72,7 +72,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CanMarkAsRejectedFromPending()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
 
@@ -84,7 +84,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CantMarkAsCompletedFromPending()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
 
@@ -94,7 +94,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CantMarkAsCancelledWithoutJustification()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             order.MarkAsAccepted();
@@ -106,7 +106,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CanMarkAsCancelledWithJustificationFromPending()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             order.MarkAsAccepted();
@@ -119,7 +119,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CantMarkAsProcessingFromPending()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
 
@@ -129,7 +129,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CanMarkAsProcessingFromAccepted()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             order.MarkAsAccepted();
@@ -142,7 +142,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CantMarkAsCompletedFromAccepted()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             order.MarkAsAccepted();
@@ -153,7 +153,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CanMarkAsCompletedFromProcessing()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             order.MarkAsAccepted();
@@ -167,7 +167,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CantChangeStatusAfterRejected()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             order.MarkAsRejected();
@@ -181,7 +181,7 @@ namespace OrderService.Tests.Domain.Entites
         [Fact]
         public void Order_CantChangeStatusAfterCancelled()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             var order = new Order(Guid.NewGuid(), OrderMode.Counter, orderTotalAmount);
             order.MarkAsAccepted();

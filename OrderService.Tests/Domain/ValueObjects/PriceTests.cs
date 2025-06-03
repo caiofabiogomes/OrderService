@@ -3,14 +3,14 @@ using OrderService.Domain.ValueObjects;
 
 namespace OrderService.Tests.Domain.ValueObjects
 {
-    public class OrderTotalAmountTests
+    public class PriceTests
     {
         [Fact]
         public void Order_ShouldNotAcceptedNegativeTotalAmount()
         {
             decimal invalidAmount = -100;
 
-            var exception = Assert.Throws<DomainException>(() => new OrderTotalAmount(invalidAmount));
+            var exception = Assert.Throws<DomainException>(() => new Price(invalidAmount));
 
             Assert.Equal(DomainExceptionMessages.InvalidOrderTotalAmount, exception.Message);
         }
@@ -18,7 +18,7 @@ namespace OrderService.Tests.Domain.ValueObjects
         [Fact]
         public void Order_ShouldAcceptedPostiveTotalAmount()
         {
-            var orderTotalAmount = new OrderTotalAmount(100);
+            var orderTotalAmount = new Price(100);
 
             Assert.Equal(100, orderTotalAmount.Amount);
         }
@@ -29,7 +29,7 @@ namespace OrderService.Tests.Domain.ValueObjects
         {
             decimal invalidAmount = 0;
 
-            var exception = Assert.Throws<DomainException>(() => new OrderTotalAmount(invalidAmount));
+            var exception = Assert.Throws<DomainException>(() => new Price(invalidAmount));
 
             Assert.Equal(DomainExceptionMessages.InvalidOrderTotalAmount, exception.Message);
         }

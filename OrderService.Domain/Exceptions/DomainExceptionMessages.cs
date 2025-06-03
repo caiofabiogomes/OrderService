@@ -10,5 +10,6 @@ namespace OrderService.Domain.Exceptions
         public const string InvalidOrderStatusTransitionToRejected = "Cannot reject an order that is {0}.";
         public const string InvalidOrderStatusTransitionToAccepted = "Cannot accept an order that  is {0}.";
         public const string InvalidOrderStatusTransitionToCancelledWithoutJustification = "Cannot cancel an order that has been accepted without providing a justification.";
+        public const string InvalidOrderItemQuantity = "Order item quantity must be greater than zero.";
     }
 }

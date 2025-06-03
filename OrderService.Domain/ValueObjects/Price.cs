@@ -2,9 +2,9 @@
 
 namespace OrderService.Domain.ValueObjects
 {
-    public sealed class OrderTotalAmount : IEquatable<OrderTotalAmount>
+    public sealed class Price : IEquatable<Price>
     {
-        public OrderTotalAmount(decimal amount)
+        public Price(decimal amount)
         {
             Validate(amount);
             Amount = amount;
@@ -12,9 +12,9 @@ namespace OrderService.Domain.ValueObjects
 
         public decimal Amount { get; private set; }
 
-        public override bool Equals(object? obj) => Equals(obj as OrderTotalAmount);
+        public override bool Equals(object? obj) => Equals(obj as Price);
 
-        public bool Equals(OrderTotalAmount? other)
+        public bool Equals(Price? other)
         {
             if (other is null) 
                 return false;

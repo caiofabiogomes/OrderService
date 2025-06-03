@@ -9,7 +9,7 @@ namespace OrderService.Domain.Entities
         {
         }
 
-        public Order(Guid customerId,OrderMode mode, OrderTotalAmount totalAmount)
+        public Order(Guid customerId,OrderMode mode, Price totalAmount)
         {
             CustomerId = customerId;
             OrderStatus = new ValueObjects.OrderStatus();
@@ -19,15 +19,25 @@ namespace OrderService.Domain.Entities
         }
 
         public Guid CustomerId { get; private set; }
+        
         public ValueObjects.OrderStatus OrderStatus { get; private set; }
+        
         public OrderMode Mode { get; private set; }
+        
         public DateTime OrderDate { get;  init; }
-        public OrderTotalAmount TotalAmount { get; private set; }
+        
+        public Price TotalAmount { get; private set; }
+
+        public ICollection<OrderItem> OrderItems { get; private set; } = new List<OrderItem>();
 
         public void MarkAsAccepted() => OrderStatus = OrderStatus.Accepted();
+        
         public void MarkAsRejected() => OrderStatus = OrderStatus.Rejected();
+        
         public void MarkAsCompleted() => OrderStatus = OrderStatus.Completed();
+        
         public void MarkAsCancelled(string justification) => OrderStatus = OrderStatus.Cancelled(justification);
+        
         public void MarkAsProcessing() => OrderStatus = OrderStatus.Processing();
     }
 }
