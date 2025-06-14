@@ -1,15 +1,19 @@
-﻿using OrderService.Application.Abstractions;
+﻿using AutoMapper;
+using OrderService.Application.Abstractions;
 using OrderService.Application.Events;
-using OrderService.Application.Events.Abstractions;
 using OrderService.Application.Mediator;
+using OrderService.Contracts.Events;
 using OrderService.Domain.Repositories;
 
 namespace OrderService.Application.Commands.CancelOrder
 {
-    public class CancelOrderCommandHandler(IOrderRepository orderRepository, ICancelOrderEventPublisher cancelOrderEventPublisher) : IRequestHandler<CancelOrderCommand, Result<Guid>>
+    public class CancelOrderCommandHandler(IOrderRepository orderRepository,
+                                           ICancelOrderEventPublisher cancelOrderEventPublisher,
+                                           IMapper mapper) : IRequestHandler<CancelOrderCommand, Result<Guid>>
     {
         private readonly IOrderRepository _orderRepository = orderRepository;
         private readonly ICancelOrderEventPublisher _cancelOrderEventPublisher = cancelOrderEventPublisher;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<Result<Guid>> Handle(CancelOrderCommand request)
         {
@@ -31,11 +35,7 @@ namespace OrderService.Application.Commands.CancelOrder
 
             await _orderRepository.UpdateAsync(order);
             
-            var cancelOrderEvent = new CancelOrderEvent()
-            {
-                OrderId = request.OrderId,
-                Justification = request.Justification
-            };
+            var cancelOrderEvent = _mapper.Map<CancelOrderEvent>(order);
 
             await _cancelOrderEventPublisher.PublishAsync(cancelOrderEvent);
             return Result<Guid>.Success(order.Id);

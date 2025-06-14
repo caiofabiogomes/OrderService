@@ -1,16 +1,21 @@
-﻿using OrderService.Application.Abstractions;
-using OrderService.Application.Events.Abstractions;
+﻿using AutoMapper;
+using OrderService.Application.Abstractions;
+using OrderService.Application.Events;
 using OrderService.Application.Mediator;
+using OrderService.Contracts.Events;
 using OrderService.Domain.Entities;
 using OrderService.Domain.Repositories;
 using OrderService.Domain.ValueObjects;
 
 namespace OrderService.Application.Commands.PlaceOrder
 {
-    public class PlaceOrderCommandHandler(IOrderRepository orderRepository, IOrderCreatedEventPublisher orderCreatedEventPublisher) : IRequestHandler<PlaceOrderCommand, Result<Guid>>
+    public class PlaceOrderCommandHandler(IOrderRepository orderRepository,
+                                          IOrderCreatedEventPublisher orderCreatedEventPublisher,
+                                          IMapper mapper) : IRequestHandler<PlaceOrderCommand, Result<Guid>>
     {
         private readonly IOrderRepository _orderRepository = orderRepository;
         private readonly IOrderCreatedEventPublisher _orderCreatedEventPublisher = orderCreatedEventPublisher;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<Result<Guid>> Handle(PlaceOrderCommand request)
         {
@@ -37,8 +42,8 @@ namespace OrderService.Application.Commands.PlaceOrder
             foreach (var item in request.Items)
             {
                 items.Add(new OrderItem(item.ProductId,
-                    new OrderItemQuantity(item.Quantity), 
-                    new ItemDescription("teste", "description"), 
+                    new OrderItemQuantity(item.Quantity),
+                    new ItemDescription("teste", "description"),
                     new Price(15.3m)));
             }
 
@@ -47,7 +52,9 @@ namespace OrderService.Application.Commands.PlaceOrder
 
             await _orderRepository.AddAsync(order);
 
-           await _orderCreatedEventPublisher.PublishAsync(new Events.OrderCreatedEvent() { CustomerId = order.CustomerId});
+            var createOrderDto = _mapper.Map<CreateOrderEvent>(order);
+
+            await _orderCreatedEventPublisher.PublishAsync(createOrderDto);
 
             return Result<Guid>.Success(order.Id, "Order placed successfully.");
 

@@ -1,4 +1,6 @@
-﻿namespace OrderService.Application.Events.Abstractions
+﻿using OrderService.Contracts.Events;
+
+namespace OrderService.Application.Events
 {
     public interface ICancelOrderEventPublisher
     {

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OrderService.Application.Events;
-using OrderService.Application.Events.Abstractions;
+using OrderService.Contracts.Events;
 using OrderService.Domain.Repositories;
 using OrderService.Infraestructure.Messaging.Publishers;
 using OrderService.Infraestructure.Persistence;
@@ -44,7 +44,7 @@ namespace OrderService.Infraestructure
             {
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Message<OrderCreatedEvent>(x =>
+                    cfg.Message<CreateOrderEvent>(x =>
                     {
                         x.SetEntityName("order-created-event");
                     });

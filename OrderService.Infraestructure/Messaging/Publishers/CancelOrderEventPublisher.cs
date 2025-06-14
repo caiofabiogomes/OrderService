@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 using OrderService.Application.Events;
-using OrderService.Application.Events.Abstractions;
+using OrderService.Contracts.Events;
 
 namespace OrderService.Infraestructure.Messaging.Publishers
 {
