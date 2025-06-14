@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using OrderService.Application.Commands.CancelOrder;
 using OrderService.Application.Commands.PlaceOrder;
 using OrderService.Application.Mediator;
+using OrderService.Application.Queries.GetOrdersQuery;
 
 namespace OrderService.API.Controllers
 {
@@ -15,11 +17,29 @@ namespace OrderService.API.Controllers
             _mediator = mediator;
         }
 
-
         [HttpPost("PlaceOrder")]
         public async Task<IActionResult> PlaceOrder(PlaceOrderCommand command)
         {
             var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpPost("CancelOrder")]
+        public async Task<IActionResult> CancelOrder(CancelOrderCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetOrders([FromQuery] int page)
+        {
+            var query = new GetOrdersQuery() 
+            {
+                Page = page
+            };
+
+            var result = await _mediator.Send(query);
             return Ok(result);
         }
     }

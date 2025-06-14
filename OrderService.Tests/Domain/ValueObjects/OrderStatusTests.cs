@@ -28,18 +28,6 @@ namespace OrderService.Tests.Domain.ValueObjects
         }
 
         [Fact]
-        public void Order_CantTransitionFromPendingToCancelled()
-        {
-            var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();
-            
-            var exception = Assert.Throws<DomainException>(() => orderStatus.Cancelled("Cancel Order"));
-
-            var expectedMessage = GetExpectedMessage(DomainExceptionMessages.InvalidOrderStatusTransitionToCancel, OrderService.Domain.Enums.OrderStatus.Pending);
-
-            Assert.Equal(expectedMessage, exception.Message);
-        }
-
-        [Fact]
         public void Order_CantTransitionFromPendingToProcessing()
         {
             var orderStatus = new OrderService.Domain.ValueObjects.OrderStatus();

@@ -87,7 +87,6 @@ namespace OrderService.Domain.ValueObjects
         {
             var invalidsStatus = new List<Enums.OrderStatus>
             {
-                Enums.OrderStatus.Pending,
                 Enums.OrderStatus.Rejected,
                 Enums.OrderStatus.Processing
             };
