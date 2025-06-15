@@ -40,6 +40,8 @@ namespace OrderService.Infraestructure
 
         private static IServiceCollection AddMessaging(this IServiceCollection services)
         {
+            var envHostRabbitMqServer = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
+
             services.AddMassTransit(x =>
             {
                 x.UsingRabbitMq((context, cfg) =>
@@ -54,11 +56,7 @@ namespace OrderService.Infraestructure
                         x.SetEntityName("cancel-order-event");
                     });
 
-                    cfg.Host("localhost", "/", h =>
-                    {
-                        h.Username("guest");
-                        h.Password("guest");
-                    });
+                    cfg.Host(envHostRabbitMqServer);
                 });
 
             });
