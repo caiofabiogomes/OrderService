@@ -6,6 +6,7 @@ using OrderService.Application.Commands.PlaceOrder;
 using OrderService.Application.Mediator;
 using OrderService.Application.Queries.GetOrdersQuery;
 using OrderService.Application.ViewModels;
+using OrderService.Domain.Abstractions;
 
 namespace OrderService.Application
 {
@@ -17,7 +18,7 @@ namespace OrderService.Application
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IRequestHandler<PlaceOrderCommand, Result<Guid>>, PlaceOrderCommandHandler>();
             services.AddScoped<IRequestHandler<CancelOrderCommand, Result<Guid>>, CancelOrderCommandHandler>();
-            services.AddScoped<IRequestHandler<GetOrdersQuery, Result<List<OrderViewModel>>>, GetOrdersQueryHandler>();
+            services.AddScoped<IRequestHandler<GetOrdersQuery, Result<PagedResult<OrderViewModel>>>, GetOrdersQueryHandler>();
             return services;
         }
     }

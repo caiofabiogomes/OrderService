@@ -1,4 +1,5 @@
-﻿using OrderService.Domain.Entities;
+﻿using OrderService.Domain.Abstractions;
+using OrderService.Domain.Entities;
 
 namespace OrderService.Domain.Repositories
 {
@@ -6,7 +7,7 @@ namespace OrderService.Domain.Repositories
     {
         Task<Order?> GetByIdAsync(Guid orderId);
         Task<Order?> GetByCustomerIdAndOrderIdAsync(Guid customerId, Guid orderId);
-        Task<List<Order>> GetByCustomerIdAsync(Guid customerId, int page, int quantityPerPage);
+        Task<PagedResult<Order>> GetByCustomerIdAsync(Guid customerId, int page, int quantityPerPage);
         Task AddAsync(Order order);
         Task UpdateAsync(Order order);
     }

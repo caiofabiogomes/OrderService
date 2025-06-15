@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OrderService.Domain.Abstractions;
 using OrderService.Domain.Entities;
 using OrderService.Domain.Repositories;
 
@@ -33,8 +34,14 @@ namespace OrderService.Infraestructure.Persistence.Repositories
             return order;
         }
 
-        public async Task<List<Order>> GetByCustomerIdAsync(Guid customerId, int page, int quantityPerPage)
+        public async Task<PagedResult<Order>> GetByCustomerIdAsync(Guid customerId, int page, int quantityPerPage)
         {
+            var totalOrders = await _context.Orders
+                .Where(o => o.CustomerId == customerId)
+                .CountAsync();
+
+            var totalPages = (int)Math.Ceiling(totalOrders / (double)quantityPerPage);
+
             var orders = await _context.Orders
                 .Include(o => o.OrderItems)
                 .Where(o => o.CustomerId == customerId)
@@ -42,7 +49,13 @@ namespace OrderService.Infraestructure.Persistence.Repositories
                 .Take(quantityPerPage)
                 .ToListAsync();
 
-            return orders;
+            return new PagedResult<Order>
+            {
+                Items = orders,
+                TotalPages = totalPages,
+                CurrentPage = page
+            };
         }
+
     }
 }
