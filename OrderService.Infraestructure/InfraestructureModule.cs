@@ -2,12 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using OrderService.Application.Events;
 using OrderService.Contracts.Events;
 using OrderService.Domain.Repositories;
 using OrderService.Infraestructure.Messaging.Publishers;
 using OrderService.Infraestructure.Persistence;
 using OrderService.Infraestructure.Persistence.Repositories;
+using System.Text;
 
 namespace OrderService.Infraestructure
 {
@@ -16,9 +18,34 @@ namespace OrderService.Infraestructure
         public static IServiceCollection AddInfraestructureModule(this IServiceCollection services, IConfiguration configuration)
         {
             services
+                .AddAutentication(configuration)
                 .AddPersistence(configuration)
                 .AddRepositories()
                 .AddMessaging();
+
+            return services;
+        }
+
+        private static IServiceCollection AddAutentication(this IServiceCollection services, IConfiguration configuration)
+        {
+            var jwtKey = configuration["Jwt:Key"];
+
+            services.AddAuthentication("Bearer")
+            .AddJwtBearer("Bearer", options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.ASCII.GetBytes(jwtKey)
+                    )
+                };
+            });
+
+            services.AddAuthorization();
 
             return services;
         }

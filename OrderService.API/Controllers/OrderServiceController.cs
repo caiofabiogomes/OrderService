@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Application.Commands.CancelOrder;
 using OrderService.Application.Commands.PlaceOrder;
@@ -18,6 +19,7 @@ namespace OrderService.API.Controllers
         }
 
         [HttpPost("PlaceOrder")]
+        [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> PlaceOrder(PlaceOrderCommand command)
         {
             var result = await _mediator.Send(command);
@@ -25,6 +27,7 @@ namespace OrderService.API.Controllers
         }
 
         [HttpPost("CancelOrder")]
+        [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> CancelOrder(CancelOrderCommand command)
         {
             var result = await _mediator.Send(command);
@@ -32,6 +35,7 @@ namespace OrderService.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> GetOrders([FromQuery] int page)
         {
             var query = new GetOrdersQuery() 
