@@ -4,6 +4,7 @@ using OrderService.Application.Commands.CancelOrder;
 using OrderService.Application.Commands.PlaceOrder;
 using OrderService.Application.Mediator;
 using OrderService.Application.Queries.GetOrdersQuery;
+using System.Security.Claims;
 
 namespace OrderService.API.Controllers
 {
@@ -22,6 +23,9 @@ namespace OrderService.API.Controllers
         [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> PlaceOrder(PlaceOrderCommand command)
         {
+            var customerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            command.CustomerId = customerId;
+
             var result = await _mediator.Send(command);
             return Ok(result);
         }
@@ -38,9 +42,12 @@ namespace OrderService.API.Controllers
         [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> GetOrders([FromQuery] int page)
         {
+            var customerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
             var query = new GetOrdersQuery() 
             {
-                Page = page
+                Page = page,
+                CustomerId = customerId,
             };
 
             var result = await _mediator.Send(query);

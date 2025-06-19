@@ -4,11 +4,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using OrderService.Application.Events;
+using OrderService.Application.ExternalServices;
 using OrderService.Contracts.Events;
 using OrderService.Domain.Repositories;
 using OrderService.Infraestructure.Messaging.Publishers;
 using OrderService.Infraestructure.Persistence;
 using OrderService.Infraestructure.Persistence.Repositories;
+using OrderService.Infrastructure.ExternalServices;
 using System.Text;
 
 namespace OrderService.Infraestructure
@@ -20,6 +22,7 @@ namespace OrderService.Infraestructure
             services
                 .AddAutentication(configuration)
                 .AddPersistence(configuration)
+                .AddExternalServices()
                 .AddRepositories()
                 .AddMessaging();
 
@@ -62,6 +65,16 @@ namespace OrderService.Infraestructure
         private static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             services.AddScoped<IOrderRepository, OrderRepository>();
+            return services;
+        }
+
+        private static IServiceCollection AddExternalServices(this IServiceCollection services) 
+        { 
+            services.AddHttpClient<IGetItemsOrderService, GetItemsOrderService>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7014/"); 
+            });
+
             return services;
         }
 

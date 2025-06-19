@@ -13,10 +13,8 @@ namespace OrderService.Application.Queries.GetOrdersQuery
         private readonly IMapper _mapper = mapper;
 
         public async Task<Result<PagedResult<OrderViewModel>>> Handle(GetOrdersQuery request)
-        {
-            var customerId = new Guid("3FA85F64-5717-4562-B3FC-2C963F66AFA6");
-
-            var orders = await _orderRepository.GetByCustomerIdAsync(customerId, request.Page, 10);
+        { 
+            var orders = await _orderRepository.GetByCustomerIdAsync(request.CustomerId, request.Page, 10);
 
             List<OrderViewModel> mappedOrders = _mapper.Map<List<OrderViewModel>>(orders.Items);
             

@@ -3,19 +3,21 @@ using OrderService.Application.Mediator;
 using OrderService.Domain.Enums;
 using OrderService.Domain.Exceptions;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace OrderService.Application.Commands.PlaceOrder
 { 
     public class PlaceOrderCommand : IRequest<Result<Guid>>, IValidatableObject
     {
         [Required]
-        public Guid CustomerId { get; set; }
+        [JsonIgnore]
+        public Guid CustomerId { get; set; } = Guid.Empty;
 
         [Required]
         public OrderMode Mode { get; set; }
 
         [Required]
-        public List<OrderItemDto> Items { get; set; } = new List<OrderItemDto>();
+        public List<PlaceOrderCommandItem> Items { get; set; } = new List<PlaceOrderCommandItem>();
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         { 
@@ -26,7 +28,7 @@ namespace OrderService.Application.Commands.PlaceOrder
         }
     }
 
-    public class OrderItemDto
+    public class PlaceOrderCommandItem
     {
         [Required]
         public Guid ProductId { get; set; }
