@@ -27,6 +27,12 @@ namespace OrderService.API.Controllers
             command.CustomerId = customerId;
 
             var result = await _mediator.Send(command);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+
             return Ok(result);
         }
 
@@ -35,6 +41,12 @@ namespace OrderService.API.Controllers
         public async Task<IActionResult> CancelOrder(CancelOrderCommand command)
         {
             var result = await _mediator.Send(command);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+
             return Ok(result);
         }
 
@@ -51,6 +63,12 @@ namespace OrderService.API.Controllers
             };
 
             var result = await _mediator.Send(query);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+
             return Ok(result);
         }
     }
