@@ -3,14 +3,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using OrderService.Application.Abstractions;
+using OrderService.Application.Commands.AcceptOrRejectOrder;
 using OrderService.Application.Events;
 using OrderService.Application.ExternalServices;
+using OrderService.Application.IMessaging;
+using OrderService.Application.Mediator;
 using OrderService.Contracts.Events;
 using OrderService.Domain.Repositories;
 using OrderService.Infraestructure.Messaging.Publishers;
 using OrderService.Infraestructure.Persistence;
 using OrderService.Infraestructure.Persistence.Repositories;
 using OrderService.Infrastructure.ExternalServices;
+using OrderService.Infrastructure.Messaging.Consumers;
+using OrderService.Infrastructure.Messaging.Publishers;
 using System.Text;
 
 namespace OrderService.Infraestructure
@@ -23,6 +29,7 @@ namespace OrderService.Infraestructure
                 .AddAutentication(configuration)
                 .AddPersistence(configuration)
                 .AddExternalServices()
+                .AddConsumersCommands()
                 .AddRepositories()
                 .AddMessaging();
 
@@ -67,6 +74,12 @@ namespace OrderService.Infraestructure
             services.AddScoped<IOrderRepository, OrderRepository>();
             return services;
         }
+        
+        private static IServiceCollection AddConsumersCommands(this IServiceCollection services)
+        {
+            services.AddScoped<IRequestHandler<AcceptOrRejectOrderCommand, Result<Guid>>, AcceptOrRejectOrderCommandHandler>();
+            return services;
+        }
 
         private static IServiceCollection AddExternalServices(this IServiceCollection services) 
         { 
@@ -84,6 +97,8 @@ namespace OrderService.Infraestructure
 
             services.AddMassTransit(x =>
             {
+                x.AddConsumer<AcceptOrRejectOrderEventConsumer>();
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Message<CreateOrderEvent>(x =>
@@ -94,6 +109,11 @@ namespace OrderService.Infraestructure
                     cfg.Message<CancelOrderEvent>(x =>
                     {
                         x.SetEntityName("cancel-order-event");
+                    });
+
+                    cfg.ReceiveEndpoint("accept-or-reject-order-event", e =>
+                    {
+                        e.ConfigureConsumer<AcceptOrRejectOrderEventConsumer>(context);
                     });
 
                     cfg.Host(envHostRabbitMqServer);
