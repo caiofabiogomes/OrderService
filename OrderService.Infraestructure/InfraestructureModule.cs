@@ -7,7 +7,6 @@ using OrderService.Application.Abstractions;
 using OrderService.Application.Commands.AcceptOrRejectOrder;
 using OrderService.Application.Events;
 using OrderService.Application.ExternalServices;
-using OrderService.Application.IMessaging;
 using OrderService.Application.Mediator;
 using OrderService.Contracts.Events;
 using OrderService.Domain.Repositories;
@@ -16,7 +15,6 @@ using OrderService.Infraestructure.Persistence;
 using OrderService.Infraestructure.Persistence.Repositories;
 using OrderService.Infrastructure.ExternalServices;
 using OrderService.Infrastructure.Messaging.Consumers;
-using OrderService.Infrastructure.Messaging.Publishers;
 using System.Text;
 
 namespace OrderService.Infraestructure
