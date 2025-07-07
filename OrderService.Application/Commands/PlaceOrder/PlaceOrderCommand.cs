@@ -13,6 +13,9 @@ namespace OrderService.Application.Commands.PlaceOrder
         [JsonIgnore]
         public Guid CustomerId { get; set; } = Guid.Empty;
 
+        [JsonIgnore]
+        public string? Token { get; set; }
+
         [Required]
         public OrderMode Mode { get; set; }
 

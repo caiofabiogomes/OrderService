@@ -23,7 +23,7 @@ namespace OrderService.Application.Commands.CancelOrder
             if (string.IsNullOrWhiteSpace(request.Justification)) 
                 return Result<Guid>.Failure("Justification is required for cancelling an order."); 
 
-            var order = await _orderRepository.GetByCustomerIdAndOrderIdAsync(request.OrderId, request.OrderId);
+            var order = await _orderRepository.GetByCustomerIdAndOrderIdAsync(request.CustomerId, request.OrderId);
             
             if (order == null) 
                 return Result<Guid>.Failure("Order not found."); 
@@ -34,8 +34,12 @@ namespace OrderService.Application.Commands.CancelOrder
             order.MarkAsCancelled(request.Justification);
 
             await _orderRepository.UpdateAsync(order);
-            
-            var cancelOrderEvent = _mapper.Map<CancelOrderEvent>(order);
+
+            var cancelOrderEvent = new CancelOrderEvent()
+            {
+                OrderId = order.Id,
+                Justification = request.Justification,
+            };
 
             await _cancelOrderEventPublisher.PublishAsync(cancelOrderEvent);
             return Result<Guid>.Success(order.Id);

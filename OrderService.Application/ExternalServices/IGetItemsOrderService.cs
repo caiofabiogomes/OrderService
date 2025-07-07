@@ -5,6 +5,6 @@ namespace OrderService.Application.ExternalServices
 {
     public interface IGetItemsOrderService
     {
-        Task<Result<List<GetItemsViewModel>>> GetItemsAsync(List<Guid> itemsIds);
+        Task<Result<List<GetItemsViewModel>>> GetItemsAsync(List<Guid> itemsIds, string token);
     }
 }

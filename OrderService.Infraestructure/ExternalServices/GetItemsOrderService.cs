@@ -3,6 +3,7 @@ using OrderService.Application.Abstractions;
 using OrderService.Application.Commands.PlaceOrder;
 using OrderService.Application.ExternalServices;
 using OrderService.Application.ViewModels;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace OrderService.Infrastructure.ExternalServices
@@ -16,13 +17,15 @@ namespace OrderService.Infrastructure.ExternalServices
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        public async Task<Result<List<GetItemsViewModel>>> GetItemsAsync(List<Guid> itemsIds)
+        public async Task<Result<List<GetItemsViewModel>>> GetItemsAsync(List<Guid> itemsIds, string token)
         {
             if (itemsIds == null || !itemsIds.Any())
                 return Result<List<GetItemsViewModel>>.Failure("Order ID cannot be empty.");
 
             try
             {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
                 var response = await _httpClient.PostAsJsonAsync("api/v1/products/getProductsList", itemsIds);
 
                 if (!response.IsSuccessStatusCode)

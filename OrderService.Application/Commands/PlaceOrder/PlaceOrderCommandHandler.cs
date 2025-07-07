@@ -27,7 +27,7 @@ namespace OrderService.Application.Commands.PlaceOrder
                 return Result<Guid>.Failure("Order must contain at least one item.");
             }
 
-            var items = await _getItemsOrderService.GetItemsAsync(request.Items.Select(i => i.ProductId).ToList());
+            var items = await _getItemsOrderService.GetItemsAsync(request.Items.Select(i => i.ProductId).ToList(), request.Token);
 
             if (!items.IsSuccess)
                 return Result<Guid>.Failure("Failed to Process Order. An error ocurred to get the items");
@@ -48,7 +48,7 @@ namespace OrderService.Application.Commands.PlaceOrder
 
             foreach (var item in items.Data)
             {
-                if(!item.IsAvaliable)
+                if(!item.IsAvailable)
                     return Result<Guid>.Failure($"Product {item.Name} is not available for purchase.");
 
                 if (string.IsNullOrWhiteSpace(item.Description))

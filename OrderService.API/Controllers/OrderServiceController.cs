@@ -26,6 +26,14 @@ namespace OrderService.API.Controllers
             var customerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             command.CustomerId = customerId;
 
+            var token = HttpContext.Request.Headers["Authorization"].ToString();
+
+            if (token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+                command.Token = token.Substring("Bearer ".Length).Trim();
+            }
+
+
             var result = await _mediator.Send(command);
 
             if (!result.IsSuccess)
@@ -40,6 +48,9 @@ namespace OrderService.API.Controllers
         [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> CancelOrder(CancelOrderCommand command)
         {
+            var customerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            command.CustomerId = customerId;
+
             var result = await _mediator.Send(command);
 
             if (!result.IsSuccess)

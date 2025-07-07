@@ -80,10 +80,12 @@ namespace OrderService.Infraestructure
         }
 
         private static IServiceCollection AddExternalServices(this IServiceCollection services) 
-        { 
+        {
+            var envService = Environment.GetEnvironmentVariable("URL_PRODUCTS_API") ?? "https://localhost:7014/";
+
             services.AddHttpClient<IGetItemsOrderService, GetItemsOrderService>(client =>
             {
-                client.BaseAddress = new Uri("https://localhost:7014/"); 
+                client.BaseAddress = new Uri(envService); 
             });
 
             return services;
@@ -91,7 +93,7 @@ namespace OrderService.Infraestructure
 
         private static IServiceCollection AddMessaging(this IServiceCollection services)
         {
-            var envHostRabbitMqServer = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
+            var envHostRabbitMqServer = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "rabbitmq://localhost:31001";
 
             services.AddMassTransit(x =>
             {
