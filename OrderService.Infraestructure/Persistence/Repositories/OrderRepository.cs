@@ -16,13 +16,12 @@ namespace OrderService.Infraestructure.Persistence.Repositories
             return order;
         }
 
-        public async Task AddAsync(Order order)
+        public async Task AddWithoutSaveChangesAsync(Order order)
         {
             await _context.Orders.AddAsync(order);
-            await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Order order)
+        public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
         }

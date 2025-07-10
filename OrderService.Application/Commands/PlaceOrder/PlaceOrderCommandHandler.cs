@@ -64,11 +64,13 @@ namespace OrderService.Application.Commands.PlaceOrder
 
             var order = new Order(request.CustomerId, request.Mode, itemsOrder);
 
-            await _orderRepository.AddAsync(order);
+            await _orderRepository.AddWithoutSaveChangesAsync(order);
 
             var createOrderDto = _mapper.Map<CreateOrderEvent>(order);
 
             await _orderCreatedEventPublisher.PublishAsync(createOrderDto);
+
+            await _orderRepository.SaveChangesAsync();
 
             return Result<Guid>.Success(order.Id, "Order placed successfully.");
         }

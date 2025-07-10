@@ -81,7 +81,7 @@ namespace OrderService.Infraestructure
 
         private static IServiceCollection AddExternalServices(this IServiceCollection services) 
         {
-            var envService = Environment.GetEnvironmentVariable("URL_PRODUCTS_API") ?? "https://localhost:7014/";
+            var envService = Environment.GetEnvironmentVariable("URL_PRODUCTS_API") ?? "http://localhost:32000/menu/";
 
             services.AddHttpClient<IGetItemsOrderService, GetItemsOrderService>(client =>
             {
@@ -99,6 +99,12 @@ namespace OrderService.Infraestructure
             {
                 x.AddConsumer<AcceptOrRejectOrderEventConsumer>();
 
+                x.AddEntityFrameworkOutbox<OrderServiceDBContext>(o =>
+                {
+                    o.UseSqlServer();
+                    o.UseBusOutbox();
+                });
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Message<CreateOrderEvent>(x =>
@@ -114,6 +120,7 @@ namespace OrderService.Infraestructure
                     cfg.ReceiveEndpoint("accept-or-reject-order-event", e =>
                     {
                         e.ConfigureConsumer<AcceptOrRejectOrderEventConsumer>(context);
+                        e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
                     });
 
                     cfg.Host(envHostRabbitMqServer);

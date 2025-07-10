@@ -8,7 +8,7 @@ namespace OrderService.Domain.Repositories
         Task<Order?> GetByIdAsync(Guid orderId);
         Task<Order?> GetByCustomerIdAndOrderIdAsync(Guid customerId, Guid orderId);
         Task<PagedResult<Order>> GetByCustomerIdAsync(Guid customerId, int page, int quantityPerPage);
-        Task AddAsync(Order order);
-        Task UpdateAsync(Order order);
+        Task AddWithoutSaveChangesAsync(Order order);
+        Task SaveChangesAsync();
     }
 }

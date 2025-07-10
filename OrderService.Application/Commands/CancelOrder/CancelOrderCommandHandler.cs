@@ -33,8 +33,6 @@ namespace OrderService.Application.Commands.CancelOrder
 
             order.MarkAsCancelled(request.Justification);
 
-            await _orderRepository.UpdateAsync(order);
-
             var cancelOrderEvent = new CancelOrderEvent()
             {
                 OrderId = order.Id,
@@ -42,6 +40,9 @@ namespace OrderService.Application.Commands.CancelOrder
             };
 
             await _cancelOrderEventPublisher.PublishAsync(cancelOrderEvent);
+
+            await _orderRepository.SaveChangesAsync();
+
             return Result<Guid>.Success(order.Id);
         }
     }
