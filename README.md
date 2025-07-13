@@ -15,7 +15,7 @@ Based on the project's functional requirements, this service is responsible for:
 -   **.NET**
 -   **Docker**
 -   **SQL Server**
--  **MassTransit / RabbitMQ*
+-  **MassTransit / RabbitMQ**
 
 ## Architecture & Communication
 
