@@ -5,10 +5,11 @@ using OrderService.Domain.Repositories;
 
 namespace OrderService.Application.Commands.AcceptOrRejectOrder
 {
-    public class AcceptOrRejectOrderCommandHandler(IOrderRepository orderRepository, ILogger<AcceptOrRejectOrderCommandHandler> logger) : IRequestHandler<AcceptOrRejectOrderCommand, Result<Guid>>
+    public class AcceptOrRejectOrderCommandHandler(IOrderRepository orderRepository, ILogger<AcceptOrRejectOrderCommandHandler> logger, IOrderNotificationService orderNotificationService) : IRequestHandler<AcceptOrRejectOrderCommand, Result<Guid>>
     {
         private readonly IOrderRepository _orderRepository = orderRepository;
         private readonly ILogger<AcceptOrRejectOrderCommandHandler> _logger = logger;
+        private readonly IOrderNotificationService _orderNotificationService = orderNotificationService;
 
         public async Task<Result<Guid>> Handle(AcceptOrRejectOrderCommand request)
         {
@@ -36,6 +37,8 @@ namespace OrderService.Application.Commands.AcceptOrRejectOrder
                 order.MarkAsRejected();
 
             await _orderRepository.SaveChangesAsync();
+
+            await _orderNotificationService.NotifyOrderStatusChangedAsync(order.Id, order.OrderStatus.Status.ToString());
 
             _logger.LogInformation("Order with ID {OrderId} has been {Action}.",
                 request.OrderId, request.IsAccepted ? "accepted" : "rejected");

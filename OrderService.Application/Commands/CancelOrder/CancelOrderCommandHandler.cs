@@ -9,11 +9,13 @@ namespace OrderService.Application.Commands.CancelOrder
 {
     public class CancelOrderCommandHandler(IOrderRepository orderRepository,
                                            ICancelOrderEventPublisher cancelOrderEventPublisher,
-                                           IMapper mapper) : IRequestHandler<CancelOrderCommand, Result<Guid>>
+                                           IMapper mapper,
+                                           IOrderNotificationService orderNotificationService) : IRequestHandler<CancelOrderCommand, Result<Guid>>
     {
         private readonly IOrderRepository _orderRepository = orderRepository;
         private readonly ICancelOrderEventPublisher _cancelOrderEventPublisher = cancelOrderEventPublisher;
         private readonly IMapper _mapper = mapper;
+        private readonly IOrderNotificationService _orderNotificationService = orderNotificationService;
 
         public async Task<Result<Guid>> Handle(CancelOrderCommand request)
         {
@@ -42,6 +44,8 @@ namespace OrderService.Application.Commands.CancelOrder
             await _cancelOrderEventPublisher.PublishAsync(cancelOrderEvent);
 
             await _orderRepository.SaveChangesAsync();
+
+            await _orderNotificationService.NotifyOrderStatusChangedAsync(order.Id, order.OrderStatus.Status.ToString());
 
             return Result<Guid>.Success(order.Id);
         }

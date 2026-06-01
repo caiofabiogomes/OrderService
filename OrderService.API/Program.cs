@@ -1,3 +1,6 @@
+using OrderService.API.Hubs;
+using OrderService.API.Services;
+using OrderService.Application.Abstractions;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -8,7 +11,6 @@ using Serilog;
 using Serilog.Enrichers.Span;
 using OpenTelemetry.Metrics;
 using Serilog.Sinks.Grafana.Loki;
-using OpenTelemetry.Metrics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +69,9 @@ builder.Services
     .AddInfraestructureModule(configuration)
     .AddApplicationModule();
 
+builder.Services.AddSignalR();
+builder.Services.AddScoped<IOrderNotificationService, OrderNotificationService>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -91,6 +96,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<OrderHub>("/orderHub");
 app.MapPrometheusScrapingEndpoint();
 
 app.Run();
